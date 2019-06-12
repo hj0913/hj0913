@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>黄杰的博客</title>
+  <title>黄杰|博客</title>
   
   
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://hj0913.github.io/"/>
-  <updated>2019-06-10T04:43:49.545Z</updated>
+  <updated>2019-06-12T09:35:31.126Z</updated>
   <id>https://hj0913.github.io/</id>
   
   <author>
@@ -15,6 +15,20 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>sonar+maven+jenkins架构搭建</title>
+    <link href="https://hj0913.github.io/2019/06/12/sonar-maven-jenkins%E6%9E%B6%E6%9E%84%E6%90%AD%E5%BB%BA/"/>
+    <id>https://hj0913.github.io/2019/06/12/sonar-maven-jenkins架构搭建/</id>
+    <published>2019-06-12T09:35:31.000Z</published>
+    <updated>2019-06-12T09:35:31.126Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>test</title>
