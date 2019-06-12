@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://hj0913.github.io/"/>
-  <updated>2019-06-12T11:17:37.114Z</updated>
+  <updated>2019-06-12T11:33:08.581Z</updated>
   <id>https://hj0913.github.io/</id>
   
   <author>
@@ -21,15 +21,15 @@
     <link href="https://hj0913.github.io/2019/06/12/sonar-maven-jenkins%E6%9E%B6%E6%9E%84%E6%90%AD%E5%BB%BA/"/>
     <id>https://hj0913.github.io/2019/06/12/sonar-maven-jenkins架构搭建/</id>
     <published>2019-06-12T09:35:31.000Z</published>
-    <updated>2019-06-12T11:17:37.114Z</updated>
+    <updated>2019-06-12T11:33:08.581Z</updated>
     
-    <content type="html"><![CDATA[<p>asdasdasds</p>]]></content>
+    <content type="html"><![CDATA[<p>adsasdsdsad</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;p&gt;asdasdasds&lt;/p&gt;
+        &lt;p&gt;adsasdsdsad&lt;/p&gt;
 
       
     
@@ -40,7 +40,7 @@
     
       <category term="Jenkins" scheme="https://hj0913.github.io/tags/Jenkins/"/>
     
-      <category term="maven" scheme="https://hj0913.github.io/tags/maven/"/>
+      <category term="Maven" scheme="https://hj0913.github.io/tags/Maven/"/>
     
   </entry>
   
