@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://hj0913.github.io/"/>
-  <updated>2019-06-12T11:36:37.394Z</updated>
+  <updated>2019-06-12T11:40:41.555Z</updated>
   <id>https://hj0913.github.io/</id>
   
   <author>
@@ -15,6 +15,20 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Maven</title>
+    <link href="https://hj0913.github.io/2019/06/12/Maven/"/>
+    <id>https://hj0913.github.io/2019/06/12/Maven/</id>
+    <published>2019-06-12T11:40:41.000Z</published>
+    <updated>2019-06-12T11:40:41.555Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>sonar+maven+jenkins架构搭建</title>
