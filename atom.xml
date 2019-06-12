@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Hexo</title>
+  <title>黄杰的博客</title>
   
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
+  <link href="https://hj0913.github.io/"/>
   <updated>2019-06-10T04:43:49.545Z</updated>
-  <id>http://yoursite.com/</id>
+  <id>https://hj0913.github.io/</id>
   
   <author>
-    <name>John Doe</name>
+    <name>Huang Jie</name>
     
   </author>
   
@@ -18,8 +18,8 @@
   
   <entry>
     <title>test</title>
-    <link href="http://yoursite.com/2019/06/10/test/"/>
-    <id>http://yoursite.com/2019/06/10/test/</id>
+    <link href="https://hj0913.github.io/2019/06/10/test/"/>
+    <id>https://hj0913.github.io/2019/06/10/test/</id>
     <published>2019-06-10T04:43:49.000Z</published>
     <updated>2019-06-10T04:43:49.545Z</updated>
     
@@ -32,8 +32,8 @@
   
   <entry>
     <title>“hello-world</title>
-    <link href="http://yoursite.com/2019/06/10/%E2%80%9Chello-world/"/>
-    <id>http://yoursite.com/2019/06/10/“hello-world/</id>
+    <link href="https://hj0913.github.io/2019/06/10/%E2%80%9Chello-world/"/>
+    <id>https://hj0913.github.io/2019/06/10/“hello-world/</id>
     <published>2019-06-10T04:30:37.000Z</published>
     <updated>2019-06-10T04:30:37.827Z</updated>
     
@@ -46,8 +46,8 @@
   
   <entry>
     <title>Hello World</title>
-    <link href="http://yoursite.com/2019/06/10/hello-world/"/>
-    <id>http://yoursite.com/2019/06/10/hello-world/</id>
+    <link href="https://hj0913.github.io/2019/06/10/hello-world/"/>
+    <id>https://hj0913.github.io/2019/06/10/hello-world/</id>
     <published>2019-06-10T04:19:41.550Z</published>
     <updated>2019-06-10T04:19:41.550Z</updated>
     
