@@ -208,8 +208,57 @@
 <p>下载之后会得到一个类似于harbor-offline-installer-v1.8.1.tgz的文件，用命令</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf harbor-offline-installer-v1.8.1.tgz</span><br></pre></td></tr></table></figure>
 
-<h5 id="Harbor目录简介"><a href="#Harbor目录简介" class="headerlink" title="Harbor目录简介"></a>Harbor目录简介</h5><h5 id="http安装方式"><a href="#http安装方式" class="headerlink" title="http安装方式"></a>http安装方式</h5><p>安装步骤</p>
-<h5 id="https安装方式"><a href="#https安装方式" class="headerlink" title="https安装方式"></a>https安装方式</h5>
+<h5 id="Harbor目录简介"><a href="#Harbor目录简介" class="headerlink" title="Harbor目录简介"></a>Harbor目录简介</h5><ul>
+<li>harbor.v1.8.1.tar.gz</li>
+<li>harbor.yml 启动harbor时使用的配置文件</li>
+<li>install.sh 是一个shell脚本启动脚本</li>
+<li>LICENSE 该版本许可信息</li>
+<li>prepare python写的初始化脚本</li>
+</ul>
+<h5 id="http安装方式"><a href="#http安装方式" class="headerlink" title="http安装方式"></a>http安装方式</h5><p>安装步骤</p>
+<ul>
+<li><p>配置好harbor.yml</p>
+<p><img src="C:%5CUsers%5Chuangjie%5CDesktop%5C1563438641.jpg" alt="1563438641"></p>
+</li>
+<li><p>运行install.sh 或者(./prepare 再使用docker-compose up -d启动)</p>
+</li>
+<li><p>使用浏览器<a href="http://ip可以访问harbor的web页面" target="_blank" rel="noopener">http://ip可以访问harbor的web页面</a></p>
+</li>
+<li><p>其他docker客户端如何推送到该私有镜像仓库呢？</p>
+<ul>
+<li><p>Harbor的默认安装使用<em>HTTP</em> - 因此，您需要将该选项添加<code>--insecure-registry</code>到客户端的Docker守护程序并重新启动Docker服务。</p>
+</li>
+<li><p>在客户端的docker服务器中的/etc/docker/daemon.josn中配置</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"insecure-registry"</span>:<span class="string">"harbor服务器的ip"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>登录 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker login ip -u admin -p Harbor12345</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="https安装方式"><a href="#https安装方式" class="headerlink" title="https安装方式"></a>https安装方式</h5><ul>
+<li><p>首先也是配置harbor.yml文件(放开https配置，配置相应的域名)</p>
+</li>
+<li><p>根据<a href="https://github.com/goharbor/harbor/blob/master/docs/configure_https.md" target="_blank" rel="noopener">官方</a>的文档生成对应的ssl密钥文件</p>
+</li>
+<li><p><img src="C:%5CUsers%5Chuangjie%5CDesktop%5C1563439550.jpg" alt="1563439550"></p>
+</li>
+<li><p>在对应的dockers客户端的/etc/hosts添加相应的域名解析</p>
+</li>
+<li><p>运行install.sh 或者(./prepare 再使用docker-compose up -d启动)</p>
+</li>
+<li><p>在电脑上配置 C:\Windows\System32\drivers\etc\hosts增加相应的域名解析，使用浏览器在<a href="https://ip可以访问harbor的web页面" target="_blank" rel="noopener">https://ip可以访问harbor的web页面</a></p>
+</li>
+<li><p>登录</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker login ip -u admin -p Harbor12345</span><br></pre></td></tr></table></figure></li>
+</ul>
+
         
     </section>
 </article>
