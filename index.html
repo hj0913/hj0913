@@ -150,7 +150,89 @@
     
     <section class="article-body markdown-body">
         
-        
+        <h3 id="一，前沿"><a href="#一，前沿" class="headerlink" title="一，前沿"></a>一，前沿</h3><ol>
+<li><p>Jenkins是什么？<br>Jenkins是一个开源的支持自动化构建，部署等任务的平台。基本上可以说是持续集成(CI),持续发布(CD)不可缺的工具。Jenkins的<a href="https;//jenkins.io">官方地址</a></p>
+</li>
+<li><p>本篇环境信息</p>
+<table>
+<thead>
+<tr>
+<th>工具/环境</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Linux Server</td>
+<td>CentOS 7</td>
+</tr>
+<tr>
+<td>Jenkins</td>
+<td>2.121.2</td>
+</tr>
+<tr>
+<td>JDK</td>
+<td>1.8.0_181</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>准备工作<br>安装jdk,安装maven</p>
+<h3 id="二，安装Jenkins"><a href="#二，安装Jenkins" class="headerlink" title="二，安装Jenkins"></a>二，安装Jenkins</h3></li>
+<li><p>yum源的安装</p>
+<ul>
+<li><p>yum源导入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加Yum源</span></span><br><span class="line">sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo</span><br><span class="line"><span class="comment">#导入密钥</span></span><br><span class="line">sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y jenkins</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>开放端口<br>Jenkins站点的默认监听端口是8080</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo firewall-cmd --add-port=8080/tcp --permanent</span><br><span class="line">sudo firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置Java可选路径<br> 因为Jenkins默认的java可选路径不包含我们部署的jdk路径，所以这里要配置一下，不然Jenkins服务会启动失败</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改jenkins启动脚本</span></span><br><span class="line">sudo vi /etc/init.d/jenkins</span><br><span class="line"><span class="comment">#修改candidates增加java可选路径：/usr/java/jdk1.8.0_181/bin/java</span></span><br><span class="line">candidates=<span class="string">"</span></span><br><span class="line"><span class="string">/etc/alternatives/java</span></span><br><span class="line"><span class="string">/usr/lib/jvm/java-1.8.0/bin/java</span></span><br><span class="line"><span class="string">/usr/lib/jvm/jre-1.8.0/bin/java</span></span><br><span class="line"><span class="string">/usr/lib/jvm/java-1.7.0/bin/java</span></span><br><span class="line"><span class="string">/usr/lib/jvm/jre-1.7.0/bin/java</span></span><br><span class="line"><span class="string">/usr/bin/java</span></span><br><span class="line"><span class="string">/usr/java/jdk1.8.0_181/bin/java</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动Jenkins并设置Jenkins开机启动</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#重载服务（由于前面修改了Jenkins启动脚本）</span></span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line"><span class="comment">#启动Jenkins服务</span></span><br><span class="line">sudo systemctl start jenkins</span><br><span class="line"><span class="comment">#将Jenkins服务设置为开机启动</span></span><br><span class="line"><span class="comment">#由于Jenkins不是Native Service，所以需要用chkconfig命令而不是systemctl命令</span></span><br><span class="line">sudo /sbin/chkconfig jenkins on</span><br></pre></td></tr></table></figure>
+
+<p> 浏览器输入 http://<ip address>:8080 访问Jenkins</ip></p>
+<h3 id="三，Jenkins初始化"><a href="#三，Jenkins初始化" class="headerlink" title="三，Jenkins初始化"></a>三，Jenkins初始化</h3></li>
+<li><p>解锁Jenkins<br> 查询root账号默认密码</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /var/lib/jenkins/secrets/initialAdminPassword</span><br></pre></td></tr></table></figure>
+
+<p> <img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkinsstart.png" alt="jenkins初始化"></p>
+</li>
+<li><p>选择插件<br> <img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins-getting-started-plugin-select.png-kblb.png" alt="jenkins选择插件"><br> 可以选择安装推荐的插件，也可以选择自定义的插件安装，其中这里我选择了第二种。<br> <img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/jenkins-getting-started-plugin-init.png-kblb.png" alt="jenkins初始化安装插件"></p>
+</li>
+<li><p>添加管理员<br> <img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/jenkins-getting-started-admin-add.png-kblb.png" alt="创建用户"></p>
+</li>
+<li><p>配置Jenkins URL<br>如果由域名的话可以填入域名，之后也可以修改；在系统管理=&gt;系统设置 <strong>Jenkins Location</strong>中设置<br> <img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/jenkins-getting-started-config-url.png-kblb.png" alt="配置URL"></p>
+</li>
+<li><p>开始使用Jenkins<br>配置完Jenkins URL之后就完成了整个Jenkins配置引导<br> <img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/jenkins-getting-started-done.png-kblb.png" alt="开始Jenkins"></p>
+</li>
+<li><p>点击“开始使用Jenkins”就会进入Jenkins主页<br> <img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/jenkins-home.png-kblb.png" alt="Jenkins的主页"></p>
+</li>
+</ol>
+<h3 id="四，Jenkins与git-SSH配置"><a href="#四，Jenkins与git-SSH配置" class="headerlink" title="四，Jenkins与git SSH配置"></a>四，Jenkins与git SSH配置</h3><ol>
+<li><p>首先在jenkins服务器上安装相对应的git工具</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install git</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装好git服务器，可以用gogs，GitLab或者直接使用github，gitee等仓库</p>
+</li>
+<li><p>在Jenkins服务器配置相对应的.ssh目录下配置config</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Host git.***.com(你设置的jenkins能访问到的git域名)</span><br><span class="line">    HostName git.***.com</span><br><span class="line">    Port 10022(开放的git服务ssh端口)</span><br><span class="line">    IdentityFile ~/.ssh/id_rsa(设置的公钥与私钥对应)</span><br><span class="line">    IdentitiesOnly yes</span><br></pre></td></tr></table></figure>
+
+<p>在git服务上进行相对应的ssh配置将jenkins生成的id_rsa.pub文件</p>
+</li>
+<li><p>这样配置你的jenkins服务器上应该能够clone相关的代码。如果jenkins服务与git服务放在一台服务上jenkins的web服务应该能拉取相关的代码，如果2台分开部署如何配置呢？</p>
+</li>
+<li><p>在jenkins的安装目录下进行ssh配置在/var/lib/jenkins创建相关的.ssh文件，设置相关的config以及私钥</p>
+</li>
+<li><p>在jenkins的web页面进行相关的配置将相对应的配置创建相关的密钥对应</p>
+</li>
+</ol>
+
         
     </section>
 </article>
