@@ -242,6 +242,15 @@
 <li><p>全局安装相应的angular的框架</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g @angular/cli@7.3.9</span><br></pre></td></tr></table></figure>
 
+
+</li>
+</ol>
+<ol start="4">
+<li><p>修改npm的淘宝镜像，在/var/lib/jenkins的目录下创建相关</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo su -s /bin/bash jenkins <span class="comment">#登录jenkins</span></span><br><span class="line"><span class="built_in">cd</span> /var/lib/jenkins</span><br><span class="line">touch .npmrc</span><br><span class="line">vi .npmrc</span><br><span class="line">registry=https://registry.npm.taobao.org/</span><br></pre></td></tr></table></figure>
+
+
+
 </li>
 </ol>
 <h3 id="七，jenkins修改用户运行"><a href="#七，jenkins修改用户运行" class="headerlink" title="七，jenkins修改用户运行"></a>七，jenkins修改用户运行</h3><ol>

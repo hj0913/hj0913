@@ -127,6 +127,35 @@
     <header class="article-header">
         
         <h1 itemprop="name">
+            <a href="/2019/07/23/修改docker日志目录/">修改docker日志目录</a>
+        </h1>
+        
+        <div class="article-meta clearfix">
+            <a class="article-date" href="https://hj0913.github.io/index.html">
+    
+    <i class="icon-calendar"></i>
+    
+    <time datetime="2019-07-23T04:35:54.000Z" itemprop="datePublished">2019-07-23</time>
+</a>
+
+            
+
+        </div>
+    </header>
+    
+    <section class="article-body markdown-body">
+        
+        
+        
+    </section>
+</article>
+
+
+    <article class="article" itemscope itemprop="blogPost">
+    
+    <header class="article-header">
+        
+        <h1 itemprop="name">
             <a href="/2019/07/18/jenkins安装-yum源安装/">jenkins安装(yum源安装)</a>
         </h1>
         
@@ -285,6 +314,15 @@
 </li>
 <li><p>全局安装相应的angular的框架</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g @angular/cli@7.3.9</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ol>
+<ol start="4">
+<li><p>修改npm的淘宝镜像，在/var/lib/jenkins的目录下创建相关</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo su -s /bin/bash jenkins <span class="comment">#登录jenkins</span></span><br><span class="line"><span class="built_in">cd</span> /var/lib/jenkins</span><br><span class="line">touch .npmrc</span><br><span class="line">vi .npmrc</span><br><span class="line">registry=https://registry.npm.taobao.org/</span><br></pre></td></tr></table></figure>
+
+
 
 </li>
 </ol>
