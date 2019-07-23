@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://hj0913.github.io/"/>
-  <updated>2019-07-23T04:35:54.701Z</updated>
+  <updated>2019-07-23T04:53:44.990Z</updated>
   <id>https://hj0913.github.io/</id>
   
   <author>
@@ -21,12 +21,23 @@
     <link href="https://hj0913.github.io/2019/07/23/%E4%BF%AE%E6%94%B9docker%E6%97%A5%E5%BF%97%E7%9B%AE%E5%BD%95/"/>
     <id>https://hj0913.github.io/2019/07/23/修改docker日志目录/</id>
     <published>2019-07-23T04:35:54.000Z</published>
-    <updated>2019-07-23T04:35:54.701Z</updated>
+    <updated>2019-07-23T04:53:44.990Z</updated>
+    
+    <content type="html"><![CDATA[<p>默认安装完成docker后docker的所有images及相关信息存储位置为：/var/lib/docker</p><p>镜像默认路径: /var/lib/docker/containers/</p><p>而通常我们的系统盘挂载一般不会很大，所以需要将其移到其他分区，我们可以采用软链接的方式来完成</p><h3 id="一，首先暂停docker服务"><a href="#一，首先暂停docker服务" class="headerlink" title="一，首先暂停docker服务"></a>一，首先暂停docker服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop docker.service</span><br></pre></td></tr></table></figure><h3 id="二，将文件移到指定目录"><a href="#二，将文件移到指定目录" class="headerlink" title="二，将文件移到指定目录"></a>二，将文件移到指定目录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /var/lib</span><br><span class="line"><span class="comment"># 文件复制</span></span><br><span class="line">mv docker/* /home/docker-log</span><br><span class="line"><span class="comment"># 删除原来/var/lib下的docker文件夹</span></span><br><span class="line">rm -rf docker</span><br><span class="line"><span class="comment"># 进入/dome/docker-log创建软连接</span></span><br><span class="line">ln -s /home/docker-log /var/lib/docker</span><br></pre></td></tr></table></figure><h3 id="三，重启服务"><a href="#三，重启服务" class="headerlink" title="三，重启服务"></a>三，重启服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart docker.service</span><br><span class="line">docker info <span class="comment"># 查看是否成功</span></span><br></pre></td></tr></table></figure>]]></content>
     
     <summary type="html">
     
+      
+      
+        &lt;p&gt;默认安装完成docker后docker的所有images及相关信息存储位置为：/var/lib/docker&lt;/p&gt;
+&lt;p&gt;镜像默认路径: /var/lib/docker/containers/&lt;/p&gt;
+&lt;p&gt;而通常我们的系统盘挂载一般不会很大，所以需要将其移到其他分区，我
+      
+    
     </summary>
     
+    
+      <category term="docker" scheme="https://hj0913.github.io/tags/docker/"/>
     
   </entry>
   
