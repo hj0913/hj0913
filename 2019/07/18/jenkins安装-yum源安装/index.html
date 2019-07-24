@@ -309,7 +309,11 @@
 </li>
 <li><p>切换jenkins用户登录</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo su -s /bin/bash jenkins</span><br></pre></td></tr></table></figure>
+
+
 </li>
+</ol>
+<ol start="3">
 <li><p>解决jenkins拉取不了私服代码的问题<br><img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/clipboard_20190723100820.png" alt="1563847680915"></p>
 <ul>
 <li><p>首先登录jenkins </p>
@@ -323,6 +327,26 @@
 <ul>
 <li><a href="https://stackoverflow.com/questions/15174194/jenkins-host-key-verification-failed" target="_blank" rel="noopener">参考地址</a></li>
 </ul>
+<ol start="4">
+<li><p>Jenkins远程连接linux</p>
+<p> 由于配置原因造成一下错误</p>
+<p> 错误：jenkins.plugins.publish_over.BapPublisherException: Failed to connect session for config [131]. Message [Auth fail]</p>
+<p> 配置方法：</p>
+<ul>
+<li><p>生成密钥</p>
+<p>在我的jenkins服务器上/var/lib/jenkins用户目录下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen <span class="comment"># 密钥生成路径直接默认回车</span></span><br><span class="line"><span class="built_in">cd</span> .ssh</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys <span class="comment"># 将公钥拷贝到authorized_keys文件</span></span><br><span class="line">scp authorized_keys user@ip:/root/.ssh <span class="comment">#将生成的authorized_keys拷贝到要连接的linux机器上的对应用户下的.ssh文件夹下</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置SSH server  系统管理-&gt;系统设置</p>
+<p><img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/590119-20170718153657958-1551906167.png" alt="系统设置"></p>
+<p>点击测试</p>
+<p><img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/jenkins/590119-20170718153902255-554801851.png" alt="test ssh"></p>
+</li>
+<li><p><a href="https://www.cnblogs.com/wangqianqiannb/p/7200791.html" target="_blank" rel="noopener">参考连接</a></p>
+</li>
+</ul>
+</li>
+</ol>
 <h3 id="九，总结"><a href="#九，总结" class="headerlink" title="九，总结"></a>九，总结</h3><p>​        至此yum源安装的jenkins就完毕了，之后会陆续推出相关的docker中安装jenkins，在k8s中使用jenkins的master/salves模式</p>
 
         
