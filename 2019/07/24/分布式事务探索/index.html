@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="UTF-8">
+
+    
+
+    
+
+    <title>黄杰|博客</title>
+    <meta name="author" content="Huang Jie">
+    <meta name="version" content="1.0.0">
+    <meta name="keywords" content>
+    <meta name="description" content="title: 分布式事务探索date: 2019-07-24 17:43:57tags:微服务分布式前言不知道你是否遇到过这样的情况，去小卖铺买东西，付了钱，但是店主因为处理了一些其他事，居然忘记你付了钱，又叫你重新付。又或者在网上购物明明已经扣款，但是却告诉我没有发生交易。这一系列情况都是因为没有事务导致的。这说明了事务在生活中的一些重要性。有了事务，你去小卖铺买东西，那就是一手交钱一手交货。有了事务，你去网上购物，扣款即产生订单交易。事务的具体定义事务提供一种机制将一个活动涉及...">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+    
+    <link rel="alternate" href="/atom.xml" title="黄杰|博客" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/images/favicon.ico">
+    
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <main class="app">
+        <header class="header clearfix">
+    <div id="nav" class="nav">
+    <div class="nav-mobile">
+        <button id="open-panel" class="open-panel nav-mobile-item"><i class="icon-documents"></i></button>
+        <h1 class="nav-mobile-title nav-mobile-item">黄杰|博客</h1>
+        <button id="open-menus" class="open-panel nav-mobile-item"><i class="icon-library"></i></button>
+    </div>
+
+    <nav id="nav-inner" class="nav-inner">
+        
+            <a class="nav-item" href="/">
+                <span class="nav-text">首页</span>
+            </a>
+        
+            <a class="nav-item" href="/tags">
+                <span class="nav-text">标签</span>
+            </a>
+        
+            <a class="nav-item" href="/archives">
+                <span class="nav-text">归档</span>
+            </a>
+        
+            <a class="nav-item" href="/atom.xml">
+                <span class="nav-text">订阅</span>
+            </a>
+        
+            <a class="nav-item" href="/about">
+                <span class="nav-text">关于</span>
+            </a>
+        
+    </nav>
+</div>
+
+    <aside id="aside" class="aside">
+    <div id="aside-mask" class="aside-mask"></div>
+    <div id="aside-inner" class="aside-inner">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit"><i class="icon-search-stroke"></i></button><input type="hidden" name="sitesearch" value="https://hj0913.github.io"></form>
+
+        
+        
+        
+        
+
+        
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#事务的具体定义"><span class="toc-number">2.</span> <span class="toc-text">事务的具体定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据库本地事务"><span class="toc-number">3.</span> <span class="toc-text">数据库本地事务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ACID"><span class="toc-number">3.1.</span> <span class="toc-text">ACID</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#InnoDB实现原理"><span class="toc-number">3.2.</span> <span class="toc-text">InnoDB实现原理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分布式事务"><span class="toc-number">4.</span> <span class="toc-text">分布式事务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是分布式事务"><span class="toc-number">4.1.</span> <span class="toc-text">什么是分布式事务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#分布式事务产生的原因"><span class="toc-number">4.2.</span> <span class="toc-text">分布式事务产生的原因</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#service多个节点"><span class="toc-number">4.2.1.</span> <span class="toc-text">service多个节点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#resource多个节点"><span class="toc-number">4.2.2.</span> <span class="toc-text">resource多个节点</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#分布式事务的基础"><span class="toc-number">4.3.</span> <span class="toc-text">分布式事务的基础</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#CAP"><span class="toc-number">4.3.1.</span> <span class="toc-text">CAP</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#BASE"><span class="toc-number">4.3.2.</span> <span class="toc-text">BASE</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#分布式事务解决方案"><span class="toc-number">4.4.</span> <span class="toc-text">分布式事务解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#是否真的要分布式事务"><span class="toc-number">4.4.1.</span> <span class="toc-text">是否真的要分布式事务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2PC"><span class="toc-number">4.4.2.</span> <span class="toc-text">2PC</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#TCC"><span class="toc-number">4.4.3.</span> <span class="toc-text">TCC</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#本地消息表"><span class="toc-number">4.4.4.</span> <span class="toc-text">本地消息表</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#MQ事务"><span class="toc-number">4.4.5.</span> <span class="toc-text">MQ事务</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Saga事务"><span class="toc-number">4.4.6.</span> <span class="toc-text">Saga事务</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#最后"><span class="toc-number">4.5.</span> <span class="toc-text">最后</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+</header>
+
+        <div id="content" class="content"><article class="article" itemscope itemprop="blogPost">
+    
+    <section class="article-body markdown-body">
+        
+        <hr>
+<p>title: 分布式事务探索<br>date: 2019-07-24 17:43:57<br>tags:</p>
+<ul>
+<li>微服务</li>
+<li>分布式<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3>不知道你是否遇到过这样的情况，去小卖铺买东西，付了钱，但是店主因为处理了一些其他事，居然忘记你付了钱，又叫你重新付。又或者在网上购物明明已经扣款，但是却告诉我没有发生交易。这一系列情况都是因为没有事务导致的。这说明了事务在生活中的一些重要性。有了事务，你去小卖铺买东西，那就是一手交钱一手交货。有了事务，你去网上购物，扣款即产生订单交易。<h3 id="事务的具体定义"><a href="#事务的具体定义" class="headerlink" title="事务的具体定义"></a>事务的具体定义</h3>事务提供一种机制将一个活动涉及的所有操作纳入到一个不可分割的执行单元，组成事务的所有操作只有在所有操作均能正常执行的情况下方能提交，只要其中任一操作执行失败，都将导致整个事务的回滚。简单地说，事务提供一种“要么什么都不做，要么做全套（All or Nothing）”机制。<h3 id="数据库本地事务"><a href="#数据库本地事务" class="headerlink" title="数据库本地事务"></a>数据库本地事务</h3><h4 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h4>说到数据库事务就不得不说，数据库事务中的四大特性，ACID:<ul>
+<li>A:原子性(Atomicity)<br>一个事务(transaction)中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。<br>就像你买东西要么交钱收货一起都执行，要么要是发不出货，就退钱。</li>
+<li>C:一致性(Consistency)<br>事务的一致性指的是在一个事务执行之前和执行之后数据库都必须处于一致性状态。如果事务成功地完成，那么系统中所有变化将正确地应用，系统处于有效状态。如果在事务中出现错误，那么系统中的所有变化将自动地回滚，系统返回到原始状态。</li>
+<li>I:隔离性(Isolation)<br>指的是在并发环境中，当不同的事务同时操纵相同的数据时，每个事务都有各自的完整数据空间。由并发事务所做的修改必须与任何其他并发事务所做的修改隔离。事务查看数据更新时，数据所处的状态要么是另一事务修改它之前的状态，要么是另一事务修改它之后的状态，事务不会查看到中间状态的数据。<br>打个比方，你买东西这个事情，是不影响其他人的。</li>
+<li>D:持久性(Durability)<br>指的是只要事务成功结束，它对数据库所做的更新就必须永久保存下来。即使发生系统崩溃，重新启动数据库系统后，数据库还能恢复到事务成功结束时的状态。<br>打个比方，你买东西的时候需要记录在账本上，即使老板忘记了那也有据可查。<h4 id="InnoDB实现原理"><a href="#InnoDB实现原理" class="headerlink" title="InnoDB实现原理"></a>InnoDB实现原理</h4>InnoDB是mysql的一个存储引擎，大部分人对mysql都比较熟悉，这里简单介绍一下数据库事务实现的一些基本原理，在本地事务中，服务和资源在事务的包裹下可以看做是一体的:<br><img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/dis-transaction/164d65a2768cd3d6.JPG" alt="事务"><br>我们的本地事务由资源管理器进行管理:<br><img src="https://huangjie-1256186459.cos.ap-shanghai.myqcloud.com/blog/dis-transaction/clipboard.png" alt="InnoDB"><br>而事务的ACID是通过InnoDB日志和锁来保证。事务的隔离性是通过数据库锁的机制实现的，持久性通过redo log（重做日志）来实现，原子性和一致性通过Undo log来实现。UndoLog的原理很简单，为了满足事务的原子性，在操作任何数据之前，首先将数据备份到一个地方（这个存储数据备份的地方称为UndoLog）。然后进行数据的修改。如果出现了错误或者用户执行了ROLLBACK语句，系统可以利用Undo Log中的备份将数据恢复到事务开始之前的状态。 和Undo Log相反，RedoLog记录的是新数据的备份。在事务提交前，只要将RedoLog持久化即可，不需要将数据持久化。当系统崩溃时，虽然数据没有持久化，但是RedoLog已经持久化。系统可以根据RedoLog的内容，将所有数据恢复到最新的状态。 对具体实现过程有兴趣的同学可以去自行搜索扩展。</li>
+</ul>
+</li>
+</ul>
+<h3 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h3><h4 id="什么是分布式事务"><a href="#什么是分布式事务" class="headerlink" title="什么是分布式事务"></a>什么是分布式事务</h4><h4 id="分布式事务产生的原因"><a href="#分布式事务产生的原因" class="headerlink" title="分布式事务产生的原因"></a>分布式事务产生的原因</h4><h5 id="service多个节点"><a href="#service多个节点" class="headerlink" title="service多个节点"></a>service多个节点</h5><h5 id="resource多个节点"><a href="#resource多个节点" class="headerlink" title="resource多个节点"></a>resource多个节点</h5><h4 id="分布式事务的基础"><a href="#分布式事务的基础" class="headerlink" title="分布式事务的基础"></a>分布式事务的基础</h4><h5 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h5><h5 id="BASE"><a href="#BASE" class="headerlink" title="BASE"></a>BASE</h5><h4 id="分布式事务解决方案"><a href="#分布式事务解决方案" class="headerlink" title="分布式事务解决方案"></a>分布式事务解决方案</h4><h5 id="是否真的要分布式事务"><a href="#是否真的要分布式事务" class="headerlink" title="是否真的要分布式事务"></a>是否真的要分布式事务</h5><h5 id="2PC"><a href="#2PC" class="headerlink" title="2PC"></a>2PC</h5><h5 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h5><h5 id="本地消息表"><a href="#本地消息表" class="headerlink" title="本地消息表"></a>本地消息表</h5><h5 id="MQ事务"><a href="#MQ事务" class="headerlink" title="MQ事务"></a>MQ事务</h5><h5 id="Saga事务"><a href="#Saga事务" class="headerlink" title="Saga事务"></a>Saga事务</h5><h4 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h4>
+        
+    </section>
+</article>
+
+
+
+</div>
+        <footer class="footer">
+    Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, Theme by <a href="https://github.com/sanonz/hexo-theme-concise" target="_blank">Concise</a>
+
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?e4027971a230b210f4671f485b33846a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    
+</footer>
+
+    </main>
+
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.9.0/jquery.min.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        var nodes = {
+            nav: $('#nav'),
+            aside: $('#aside'),
+            asideInner: $('#aside-inner'),
+            navInner: $('#nav-inner')
+        };
+
+        var doing = false;
+        nodes.asideInner.on('webkitAnimationEnd mozAnimationEnd oAnimationEnd oanimationend animationend', function() {
+            if (nodes.aside.hasClass('mobile-open')) {
+                nodes.aside.removeClass('mobile-open');
+            } else {
+                nodes.aside.removeClass('mobile-close panel-show');
+            }
+            doing = false;
+        });
+        $('#open-panel, #aside-mask').on('click', function() {
+            if (doing) {
+                return;
+            }
+            
+            if (nodes.aside.hasClass('panel-show')) {
+                nodes.aside.addClass('mobile-close');
+            } else {
+                nodes.aside.addClass('mobile-open panel-show');
+            }
+        });
+        $('#open-menus').on('click', function() {
+            nodes.navInner.slideToggle();
+        });
+
+        if (window.innerWidth <= 960) {
+            setTimeout(function() {
+                nodes.navInner.slideUp();
+            }, 3000);
+        }
+    });
+    </script>
+    
+        <script type="text/javascript" src="/js/scrollspy.min.js"></script>
+        <script type="text/javascript">
+        $(document.body).scrollspy({target: '#aside-inner'});
+        </script>
+    
+
+</body>
+</html>
