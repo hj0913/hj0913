@@ -127,6 +127,178 @@
     <header class="article-header">
         
         <h1 itemprop="name">
+            <a href="/2019/08/13/SQL优化/">SQL优化</a>
+        </h1>
+        
+        <div class="article-meta clearfix">
+            <a class="article-date" href="https://hj0913.github.io/index.html">
+    
+    <i class="icon-calendar"></i>
+    
+    <time datetime="2019-08-13T11:04:00.000Z" itemprop="datePublished">2019-08-13</time>
+</a>
+
+            
+<div class="article-tag-list">
+    <i class="icon-tag"></i>
+    <a class="article-tag-link" href="/tags/JAVA面试/">JAVA面试</a>, <a class="article-tag-link" href="/tags/SQL/">SQL</a>
+</div>
+
+
+        </div>
+    </header>
+    
+    <section class="article-body markdown-body">
+        
+        <h2 id="SQL优化方案"><a href="#SQL优化方案" class="headerlink" title="SQL优化方案"></a>SQL优化方案</h2><h3 id="一，SQL语句性能优化"><a href="#一，SQL语句性能优化" class="headerlink" title="一，SQL语句性能优化"></a>一，SQL语句性能优化</h3><ol>
+<li><p>对查询进行优化，应尽量避免全表扫描，首先应考虑在where及order by 涉及的列上建立索引</p>
+</li>
+<li><p>应尽量避免在 where 子句中对字段进行 null 值判断，创建表时NULL是默认值，但大多数时候应该使用NOT NULL，或者使用一个特殊的值，如0，-1作为默 认值。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span> <span class="keyword">is</span> <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以在 num 上设置默认值 0,确保表中 num 列没有 null 值，然后这样查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>应尽量避免在 where 子句中使用!=或&lt;&gt;操作符， MySQL只有对以下操作符才使用索引：&lt;，&lt;=，=，&gt;，&gt;=，BETWEEN，IN，以及某些时候的LIKE。</p>
+</li>
+<li><p>应尽量避免在 where 子句中使用 or 来连接条件， 否则将导致引擎放弃使用索引而进行全表扫描， 可以 使用UNION合并查询：</p>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">10</span> <span class="keyword">or</span> <span class="keyword">num</span>=<span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>可以这样查询:<br>   <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">10</span> <span class="keyword">union</span> <span class="keyword">all</span> <span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">20</span></span><br></pre></td></tr></table></figure></p>
+<ol start="5">
+<li><p>in 和 not in 也要慎用，否则会导致全表扫描，如：</p>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span> <span class="keyword">in</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+<p> 对于连续的数值，能用 between 就不要用 in 了：</p>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span> <span class="keyword">between</span> <span class="number">1</span> <span class="keyword">and</span> <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="6">
+<li><p>如果在 where 子句中使用参数，也会导致全表扫描。因为 SQL 只有在运行时才会解析局部变量，但优 化程序不能将访问计划的选择推迟到运行时;它必须在编译时进行选择。然 而，如果在编译时建立访问计 划，变量的值还是未知的，因而无法作为索引选择的输入项。如下面语句将进行全表扫描：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=@<span class="keyword">num</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以改为强制查询使用索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">with</span>(<span class="keyword">index</span>(索引名)) <span class="keyword">where</span> <span class="keyword">num</span>=@<span class="keyword">num</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>应尽量避免在 where 子句中对字段进行表达式操作， 这将导致引擎放弃使用索引而进行全表扫描。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>/<span class="number">2</span>=<span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以这样查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">100</span>*<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>应尽量避免在 where 子句中对字段进行函数操作，这将导致引擎放弃使用索引而进行全表扫描。如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">substring</span>(<span class="keyword">name</span>,<span class="number">1</span>,<span class="number">3</span>)=<span class="string">'abc'</span>;<span class="comment">#name 以 abc 开头的 id</span></span><br></pre></td></tr></table></figure>
+
+<p>应改为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">name</span> <span class="keyword">like</span> <span class="string">'abc%'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>不要在 where 子句中的“=”左边进行函数、算术运算或其他表达式运算，否则系统将可能无法正确使用 索引。</p>
+</li>
+</ol>
+
+        
+    </section>
+</article>
+
+
+    <article class="article" itemscope itemprop="blogPost">
+    
+    <header class="article-header">
+        
+        <h1 itemprop="name">
+            <a href="/2019/08/06/k8s二进制部署-HTTPS-RBAC/">k8s二进制部署(HTTPS+RBAC)</a>
+        </h1>
+        
+        <div class="article-meta clearfix">
+            <a class="article-date" href="https://hj0913.github.io/index.html">
+    
+    <i class="icon-calendar"></i>
+    
+    <time datetime="2019-08-06T00:47:10.000Z" itemprop="datePublished">2019-08-06</time>
+</a>
+
+            
+<div class="article-tag-list">
+    <i class="icon-tag"></i>
+    <a class="article-tag-link" href="/tags/docker/">docker</a>, <a class="article-tag-link" href="/tags/k8s/">k8s</a>
+</div>
+
+
+        </div>
+    </header>
+    
+    <section class="article-body markdown-body">
+        
+        <h3 id="k8s二进制部署-HTTPS-RBAC"><a href="#k8s二进制部署-HTTPS-RBAC" class="headerlink" title="k8s二进制部署(HTTPS+RBAC)"></a>k8s二进制部署(HTTPS+RBAC)</h3><h4 id="官方提供的几种Kubernetes部署方式"><a href="#官方提供的几种Kubernetes部署方式" class="headerlink" title="官方提供的几种Kubernetes部署方式"></a>官方提供的几种Kubernetes部署方式</h4><ul>
+<li><p><strong>minikube</strong></p>
+<p>​        Minikube是一个工具，可以在本地快速运行一个单点的Kubernetes，尝试Kubernetes或日常开发的用户使用。不能用于生产环境。</p>
+<p>官方地址：<a href="https://kubernetes.io/docs/setup/minikube/" target="_blank" rel="noopener">https://kubernetes.io/docs/setup/minikube/</a></p>
+</li>
+<li><p><strong>kubeadm</strong></p>
+<p>​        Kubeadm也是一个工具，提供kubeadm init和kubeadm join，用于快速部署Kubernetes集群。</p>
+<p>官方地址：<a href="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/" target="_blank" rel="noopener">https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/</a></p>
+</li>
+<li><p><strong>二进制包</strong></p>
+<p>​        从官方下载发行版的二进制包，手动部署每个组件，组成Kubernetes集群。<br><strong>小结：</strong></p>
+<p>​        生产环境中部署Kubernetes集群，只有Kubeadm和二进制包可选，Kubeadm降低部署门槛，但屏蔽了很多细节，遇到问题很难排查。我们这里使用二进制包部署Kubernetes集群，我也是推荐大家使用这种方式，虽然手动部署麻烦点，但学习很多工作原理，更有利于后期维护。</p>
+</li>
+</ul>
+<p>参考地址：<a href="https://blog.51cto.com/lizhenliang/2325770" target="_blank" rel="noopener">李振良博客</a></p>
+
+        
+    </section>
+</article>
+
+
+    <article class="article" itemscope itemprop="blogPost">
+    
+    <header class="article-header">
+        
+        <h1 itemprop="name">
+            <a href="/2019/08/05/JAVA集合总结/">JAVA集合总结</a>
+        </h1>
+        
+        <div class="article-meta clearfix">
+            <a class="article-date" href="https://hj0913.github.io/index.html">
+    
+    <i class="icon-calendar"></i>
+    
+    <time datetime="2019-08-05T02:20:30.000Z" itemprop="datePublished">2019-08-05</time>
+</a>
+
+            
+<div class="article-tag-list">
+    <i class="icon-tag"></i>
+    <a class="article-tag-link" href="/tags/JAVA/">JAVA</a>
+</div>
+
+
+        </div>
+    </header>
+    
+    <section class="article-body markdown-body">
+        
+        <h3 id="JAVA集合总结"><a href="#JAVA集合总结" class="headerlink" title="JAVA集合总结"></a>JAVA集合总结</h3><h4 id="HashMap的实现原理"><a href="#HashMap的实现原理" class="headerlink" title="HashMap的实现原理"></a>HashMap的实现原理</h4><ul>
+<li><p>概述</p>
+<p>HashMap是基于哈希表的Map接口的非同步实现。此实现提供所有可选的映射操作，<strong>并允许使用 null 值和 null 键</strong>。此类不保证映射的顺序，特别是它不保证该顺序恒久不变。</p>
+</li>
+</ul>
+
+        
+    </section>
+</article>
+
+
+    <article class="article" itemscope itemprop="blogPost">
+    
+    <header class="article-header">
+        
+        <h1 itemprop="name">
             <a href="/2019/07/24/分布式事务探索/">分布式事务探索</a>
         </h1>
         
@@ -838,135 +1010,11 @@
 </article>
 
 
-    <article class="article" itemscope itemprop="blogPost">
-    
-    <header class="article-header">
-        
-        <h1 itemprop="name">
-            <a href="/2019/06/19/MyBatis源码分析/">MyBatis源码分析</a>
-        </h1>
-        
-        <div class="article-meta clearfix">
-            <a class="article-date" href="https://hj0913.github.io/index.html">
-    
-    <i class="icon-calendar"></i>
-    
-    <time datetime="2019-06-19T13:38:48.000Z" itemprop="datePublished">2019-06-19</time>
-</a>
-
-            
-<div class="article-tag-list">
-    <i class="icon-tag"></i>
-    <a class="article-tag-link" href="/tags/Java/">Java</a>, <a class="article-tag-link" href="/tags/MyBatis/">MyBatis</a>
-</div>
 
 
-        </div>
-    </header>
-    
-    <section class="article-body markdown-body">
-        
-        <h2 id="MyBatis源码分析"><a href="#MyBatis源码分析" class="headerlink" title="MyBatis源码分析"></a>MyBatis源码分析</h2><h3 id="MyBatis运行过程"><a href="#MyBatis运行过程" class="headerlink" title="MyBatis运行过程"></a>MyBatis运行过程</h3><ul>
-<li><p>传统的JDBC编程查询数据库代码和过程总结</p>
-<ol>
-<li>加载驱动</li>
-<li>创建连接，Connection对象</li>
-<li>根据Connection创建Statement或者PreparedStatement来执行 sql 语句</li>
-<li>返回结果集到 ResultSet 中</li>
-<li>手动将ResultSet映射到JavaBean中<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//声明Connection对象</span></span><br><span class="line">    Connection con = <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">//遍历查询结果集</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//加载驱动程序</span></span><br><span class="line">        Class.forName(<span class="string">"com.mysql.jdbc.Driver"</span>);</span><br><span class="line">        <span class="comment">//创建 connection 对象</span></span><br><span class="line">        con = DriverManager.getConnection(<span class="string">"jdbc:mysql://localhost:3306/db"</span>, <span class="string">"username"</span>, <span class="string">"password"</span>);</span><br><span class="line">        <span class="comment">//使用 connection 对象创建statement 或者 PreparedStatement 类对象，用来执行SQL语句</span></span><br><span class="line">        Statement statement = con.createStatement();</span><br><span class="line">        <span class="comment">//要执行的SQL语句</span></span><br><span class="line">        String sql = <span class="string">"select * from emp"</span>;</span><br><span class="line">        <span class="comment">//3.ResultSet类，用来存放获取的结果集！！</span></span><br><span class="line">        ResultSet rs = statement.executeQuery(sql);</span><br><span class="line">      String job = <span class="string">""</span>;</span><br><span class="line">        String id = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">            <span class="comment">//获取stuname这列数据</span></span><br><span class="line">            job = rs.getString(<span class="string">"job"</span>);</span><br><span class="line">            <span class="comment">//获取stuid这列数据</span></span><br><span class="line">            id = rs.getString(<span class="string">"ename"</span>);</span><br><span class="line">            <span class="comment">//输出结果</span></span><br><span class="line">            System.out.println(id + <span class="string">"	"</span> + job);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">        <span class="comment">//数据库连接失败异常处理</span></span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        rs.close();</span><br><span class="line">        con.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><p>MyBatis具体流程</p>
-<ol>
-<li>使用配置文件构建SqlSessionFactory</li>
-<li>使用SqlSessionFactory获得SqlSession，SqlSession相当于传统JDBC的Connection</li>
-<li>使用SqlSession得到Mapper</li>
-<li>用Mapper来执行sql语句，并返回结果直接封装到JavaBean中<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">  <span class="comment">//获取 sqlSession，sqlSession 相当于传统 JDBC 的 Conection</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> SqlSession <span class="title">getSqlSession</span><span class="params">()</span></span>&#123;</span><br><span class="line"> InputStream configFile = <span class="keyword">new</span> FileInputStream(filePath);</span><br><span class="line"> SqlSessionFactory sqlSessionFactory = <span class="keyword">new</span> SqlSessionFactoryBuilder.build(configFile);</span><br><span class="line"> <span class="keyword">return</span> sqlSessionFactory.openSession();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//使用 sqlSession 获得对应的 mapper，mapper 用来执行 sql 语句。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> User <span class="title">get</span><span class="params">(SqlSession sqlSession, <span class="keyword">int</span> id)</span></span>&#123;</span><br><span class="line"> UserMapper userMapper = sqlSession.getMapper(UserMapper.class);</span><br><span class="line"> <span class="keyword">return</span> userMapper.selectByPrimaryKey(id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><p>总结</p>
-<ol>
-<li>初始化阶段 –&gt; 读写XML配置文件和注解中的配置信息，创建配置信息，并完成各个模块的初始化工作</li>
-<li>代理阶段  –&gt; 封装batis编程模型，使用mapper接口开发的初始化工作</li>
-<li>数据读写阶段 –&gt; 通过sqlSession完成sql的解析，参数的映射，SQL的执行和结果反射的过程</li>
-</ol>
-</li>
-</ul>
-<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3>
-        
-    </section>
-</article>
-
-
-    <article class="article" itemscope itemprop="blogPost">
-    
-    <header class="article-header">
-        
-        <h1 itemprop="name">
-            <a href="/2019/06/12/Maven/">Maven</a>
-        </h1>
-        
-        <div class="article-meta clearfix">
-            <a class="article-date" href="https://hj0913.github.io/index.html">
-    
-    <i class="icon-calendar"></i>
-    
-    <time datetime="2019-06-12T11:40:41.000Z" itemprop="datePublished">2019-06-12</time>
-</a>
-
-            
-
-        </div>
-    </header>
-    
-    <section class="article-body markdown-body">
-        
-        
-        
-    </section>
-</article>
-
-
-    <article class="article" itemscope itemprop="blogPost">
-    
-    <header class="article-header">
-        
-        <h1 itemprop="name">
-            <a href="/2019/06/12/sonar-maven-jenkins架构搭建/">sonar+maven+jenkins架构搭建</a>
-        </h1>
-        
-        <div class="article-meta clearfix">
-            <a class="article-date" href="https://hj0913.github.io/index.html">
-    
-    <i class="icon-calendar"></i>
-    
-    <time datetime="2019-06-12T09:35:31.000Z" itemprop="datePublished">2019-06-12</time>
-</a>
-
-            
-<div class="article-tag-list">
-    <i class="icon-tag"></i>
-    <a class="article-tag-link" href="/tags/Jenkins/">Jenkins</a>, <a class="article-tag-link" href="/tags/Maven/">Maven</a>, <a class="article-tag-link" href="/tags/sonar/">sonar</a>
-</div>
-
-
-        </div>
-    </header>
-    
-    <section class="article-body markdown-body">
-        
-        <h3 id="sonar安装"><a href="#sonar安装" class="headerlink" title="sonar安装"></a>sonar安装</h3><ul>
-<li><h3 id="配置Maven"><a href="#配置Maven" class="headerlink" title="配置Maven"></a>配置Maven</h3></li>
-</ul>
-<h3 id="配置Jenkins"><a href="#配置Jenkins" class="headerlink" title="配置Jenkins"></a>配置Jenkins</h3>
-        
-    </section>
-</article>
-
-
-
+<nav class="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+</nav>
 
 
 </div>

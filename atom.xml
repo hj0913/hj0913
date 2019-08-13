@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://hj0913.github.io/"/>
-  <updated>2019-07-26T01:03:29.179Z</updated>
+  <updated>2019-08-13T12:54:40.803Z</updated>
   <id>https://hj0913.github.io/</id>
   
   <author>
@@ -15,6 +15,79 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>SQL优化</title>
+    <link href="https://hj0913.github.io/2019/08/13/SQL%E4%BC%98%E5%8C%96/"/>
+    <id>https://hj0913.github.io/2019/08/13/SQL优化/</id>
+    <published>2019-08-13T11:04:00.000Z</published>
+    <updated>2019-08-13T12:54:40.803Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="SQL优化方案"><a href="#SQL优化方案" class="headerlink" title="SQL优化方案"></a>SQL优化方案</h2><h3 id="一，SQL语句性能优化"><a href="#一，SQL语句性能优化" class="headerlink" title="一，SQL语句性能优化"></a>一，SQL语句性能优化</h3><ol><li><p>对查询进行优化，应尽量避免全表扫描，首先应考虑在where及order by 涉及的列上建立索引</p></li><li><p>应尽量避免在 where 子句中对字段进行 null 值判断，创建表时NULL是默认值，但大多数时候应该使用NOT NULL，或者使用一个特殊的值，如0，-1作为默 认值。</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span> <span class="keyword">is</span> <span class="literal">null</span>;</span><br></pre></td></tr></table></figure><p>可以在 num 上设置默认值 0,确保表中 num 列没有 null 值，然后这样查询：</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">0</span>;</span><br></pre></td></tr></table></figure></li><li><p>应尽量避免在 where 子句中使用!=或&lt;&gt;操作符， MySQL只有对以下操作符才使用索引：&lt;，&lt;=，=，&gt;，&gt;=，BETWEEN，IN，以及某些时候的LIKE。</p></li><li><p>应尽量避免在 where 子句中使用 or 来连接条件， 否则将导致引擎放弃使用索引而进行全表扫描， 可以 使用UNION合并查询：</p> <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">10</span> <span class="keyword">or</span> <span class="keyword">num</span>=<span class="number">20</span>;</span><br></pre></td></tr></table></figure></li></ol><p>可以这样查询:<br>   <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">10</span> <span class="keyword">union</span> <span class="keyword">all</span> <span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">20</span></span><br></pre></td></tr></table></figure></p><ol start="5"><li><p>in 和 not in 也要慎用，否则会导致全表扫描，如：</p> <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span> <span class="keyword">in</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>);</span><br></pre></td></tr></table></figure><p> 对于连续的数值，能用 between 就不要用 in 了：</p> <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span> <span class="keyword">between</span> <span class="number">1</span> <span class="keyword">and</span> <span class="number">3</span>;</span><br></pre></td></tr></table></figure></li></ol><ol start="6"><li><p>如果在 where 子句中使用参数，也会导致全表扫描。因为 SQL 只有在运行时才会解析局部变量，但优 化程序不能将访问计划的选择推迟到运行时;它必须在编译时进行选择。然 而，如果在编译时建立访问计 划，变量的值还是未知的，因而无法作为索引选择的输入项。如下面语句将进行全表扫描：</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=@<span class="keyword">num</span>;</span><br></pre></td></tr></table></figure><p>可以改为强制查询使用索引：</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">with</span>(<span class="keyword">index</span>(索引名)) <span class="keyword">where</span> <span class="keyword">num</span>=@<span class="keyword">num</span>;</span><br></pre></td></tr></table></figure></li><li><p>应尽量避免在 where 子句中对字段进行表达式操作， 这将导致引擎放弃使用索引而进行全表扫描。</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>/<span class="number">2</span>=<span class="number">100</span>;</span><br></pre></td></tr></table></figure><p>可以这样查询：</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">num</span>=<span class="number">100</span>*<span class="number">2</span>;</span><br></pre></td></tr></table></figure></li><li><p>应尽量避免在 where 子句中对字段进行函数操作，这将导致引擎放弃使用索引而进行全表扫描。如：</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">substring</span>(<span class="keyword">name</span>,<span class="number">1</span>,<span class="number">3</span>)=<span class="string">'abc'</span>;<span class="comment">#name 以 abc 开头的 id</span></span><br></pre></td></tr></table></figure><p>应改为：</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">id</span> <span class="keyword">from</span> t <span class="keyword">where</span> <span class="keyword">name</span> <span class="keyword">like</span> <span class="string">'abc%'</span>;</span><br></pre></td></tr></table></figure></li><li><p>不要在 where 子句中的“=”左边进行函数、算术运算或其他表达式运算，否则系统将可能无法正确使用 索引。</p></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;SQL优化方案&quot;&gt;&lt;a href=&quot;#SQL优化方案&quot; class=&quot;headerlink&quot; title=&quot;SQL优化方案&quot;&gt;&lt;/a&gt;SQL优化方案&lt;/h2&gt;&lt;h3 id=&quot;一，SQL语句性能优化&quot;&gt;&lt;a href=&quot;#一，SQL语句性能优化&quot; class=&quot;he
+      
+    
+    </summary>
+    
+    
+      <category term="SQL" scheme="https://hj0913.github.io/tags/SQL/"/>
+    
+      <category term="JAVA面试" scheme="https://hj0913.github.io/tags/JAVA%E9%9D%A2%E8%AF%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>k8s二进制部署(HTTPS+RBAC)</title>
+    <link href="https://hj0913.github.io/2019/08/06/k8s%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2-HTTPS-RBAC/"/>
+    <id>https://hj0913.github.io/2019/08/06/k8s二进制部署-HTTPS-RBAC/</id>
+    <published>2019-08-06T00:47:10.000Z</published>
+    <updated>2019-08-06T01:24:47.146Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="k8s二进制部署-HTTPS-RBAC"><a href="#k8s二进制部署-HTTPS-RBAC" class="headerlink" title="k8s二进制部署(HTTPS+RBAC)"></a>k8s二进制部署(HTTPS+RBAC)</h3><h4 id="官方提供的几种Kubernetes部署方式"><a href="#官方提供的几种Kubernetes部署方式" class="headerlink" title="官方提供的几种Kubernetes部署方式"></a>官方提供的几种Kubernetes部署方式</h4><ul><li><p><strong>minikube</strong></p><p>​        Minikube是一个工具，可以在本地快速运行一个单点的Kubernetes，尝试Kubernetes或日常开发的用户使用。不能用于生产环境。</p><p>官方地址：<a href="https://kubernetes.io/docs/setup/minikube/" target="_blank" rel="noopener">https://kubernetes.io/docs/setup/minikube/</a></p></li><li><p><strong>kubeadm</strong></p><p>​        Kubeadm也是一个工具，提供kubeadm init和kubeadm join，用于快速部署Kubernetes集群。</p><p>官方地址：<a href="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/" target="_blank" rel="noopener">https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/</a></p></li><li><p><strong>二进制包</strong></p><p>​        从官方下载发行版的二进制包，手动部署每个组件，组成Kubernetes集群。<br><strong>小结：</strong></p><p>​        生产环境中部署Kubernetes集群，只有Kubeadm和二进制包可选，Kubeadm降低部署门槛，但屏蔽了很多细节，遇到问题很难排查。我们这里使用二进制包部署Kubernetes集群，我也是推荐大家使用这种方式，虽然手动部署麻烦点，但学习很多工作原理，更有利于后期维护。</p></li></ul><p>参考地址：<a href="https://blog.51cto.com/lizhenliang/2325770" target="_blank" rel="noopener">李振良博客</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;k8s二进制部署-HTTPS-RBAC&quot;&gt;&lt;a href=&quot;#k8s二进制部署-HTTPS-RBAC&quot; class=&quot;headerlink&quot; title=&quot;k8s二进制部署(HTTPS+RBAC)&quot;&gt;&lt;/a&gt;k8s二进制部署(HTTPS+RBAC)&lt;/h3&gt;&lt;h4
+      
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://hj0913.github.io/tags/docker/"/>
+    
+      <category term="k8s" scheme="https://hj0913.github.io/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JAVA集合总结</title>
+    <link href="https://hj0913.github.io/2019/08/05/JAVA%E9%9B%86%E5%90%88%E6%80%BB%E7%BB%93/"/>
+    <id>https://hj0913.github.io/2019/08/05/JAVA集合总结/</id>
+    <published>2019-08-05T02:20:30.000Z</published>
+    <updated>2019-08-06T06:42:54.127Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="JAVA集合总结"><a href="#JAVA集合总结" class="headerlink" title="JAVA集合总结"></a>JAVA集合总结</h3><h4 id="HashMap的实现原理"><a href="#HashMap的实现原理" class="headerlink" title="HashMap的实现原理"></a>HashMap的实现原理</h4><ul><li><p>概述</p><p>HashMap是基于哈希表的Map接口的非同步实现。此实现提供所有可选的映射操作，<strong>并允许使用 null 值和 null 键</strong>。此类不保证映射的顺序，特别是它不保证该顺序恒久不变。</p></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;JAVA集合总结&quot;&gt;&lt;a href=&quot;#JAVA集合总结&quot; class=&quot;headerlink&quot; title=&quot;JAVA集合总结&quot;&gt;&lt;/a&gt;JAVA集合总结&lt;/h3&gt;&lt;h4 id=&quot;HashMap的实现原理&quot;&gt;&lt;a href=&quot;#HashMap的实现原理&quot; cla
+      
+    
+    </summary>
+    
+    
+      <category term="JAVA" scheme="https://hj0913.github.io/tags/JAVA/"/>
+    
+  </entry>
   
   <entry>
     <title>分布式事务探索</title>

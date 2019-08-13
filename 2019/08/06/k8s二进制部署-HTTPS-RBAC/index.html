@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="UTF-8">
+
+    
+
+    
+
+    <title>k8s二进制部署(HTTPS+RBAC) | 黄杰|博客</title>
+    <meta name="author" content="Huang Jie">
+    <meta name="version" content="1.0.0">
+    <meta name="keywords" content>
+    <meta name="description" content="k8s二进制部署(HTTPS+RBAC)官方提供的几种Kubernetes部署方式minikube​        Minikube是一个工具，可以在本地快速运行一个单点的Kubernetes，尝试Kubernetes或日常开发的用户使用。不能用于生产环境。官方地址：https://kubernetes.io/docs/setup/minikube/kubeadm​        Kubeadm也是一个工具，提供kubeadm init和kubeadm join，用于快速部署K...">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+    
+    <link rel="alternate" href="/atom.xml" title="黄杰|博客" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/images/favicon.ico">
+    
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <main class="app">
+        <header class="header clearfix">
+    <div id="nav" class="nav">
+    <div class="nav-mobile">
+        <button id="open-panel" class="open-panel nav-mobile-item"><i class="icon-documents"></i></button>
+        <h1 class="nav-mobile-title nav-mobile-item">黄杰|博客</h1>
+        <button id="open-menus" class="open-panel nav-mobile-item"><i class="icon-library"></i></button>
+    </div>
+
+    <nav id="nav-inner" class="nav-inner">
+        
+            <a class="nav-item" href="/">
+                <span class="nav-text">首页</span>
+            </a>
+        
+            <a class="nav-item" href="/tags">
+                <span class="nav-text">标签</span>
+            </a>
+        
+            <a class="nav-item" href="/archives">
+                <span class="nav-text">归档</span>
+            </a>
+        
+            <a class="nav-item" href="/atom.xml">
+                <span class="nav-text">订阅</span>
+            </a>
+        
+            <a class="nav-item" href="/about">
+                <span class="nav-text">关于</span>
+            </a>
+        
+    </nav>
+</div>
+
+    <aside id="aside" class="aside">
+    <div id="aside-mask" class="aside-mask"></div>
+    <div id="aside-inner" class="aside-inner">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit"><i class="icon-search-stroke"></i></button><input type="hidden" name="sitesearch" value="https://hj0913.github.io"></form>
+
+        
+        
+        
+        
+
+        
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#k8s二进制部署-HTTPS-RBAC"><span class="toc-number">1.</span> <span class="toc-text">k8s二进制部署(HTTPS+RBAC)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#官方提供的几种Kubernetes部署方式"><span class="toc-number">1.1.</span> <span class="toc-text">官方提供的几种Kubernetes部署方式</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+</header>
+
+        <div id="content" class="content"><article class="article" itemscope itemprop="blogPost">
+    
+    <header class="article-header">
+        
+        <h1 itemprop="name">
+            k8s二进制部署(HTTPS+RBAC)
+        </h1>
+        
+        <div class="article-meta clearfix">
+            <a class="article-date" href="https://hj0913.github.io/2019/08/06/k8s二进制部署-HTTPS-RBAC/index.html">
+    
+    <i class="icon-calendar"></i>
+    
+    <time datetime="2019-08-06T00:47:10.000Z" itemprop="datePublished">2019-08-06</time>
+</a>
+
+            
+<div class="article-tag-list">
+    <i class="icon-tag"></i>
+    <a class="article-tag-link" href="/tags/docker/">docker</a>, <a class="article-tag-link" href="/tags/k8s/">k8s</a>
+</div>
+
+
+        </div>
+    </header>
+    
+    <section class="article-body markdown-body">
+        
+        <h3 id="k8s二进制部署-HTTPS-RBAC"><a href="#k8s二进制部署-HTTPS-RBAC" class="headerlink" title="k8s二进制部署(HTTPS+RBAC)"></a>k8s二进制部署(HTTPS+RBAC)</h3><h4 id="官方提供的几种Kubernetes部署方式"><a href="#官方提供的几种Kubernetes部署方式" class="headerlink" title="官方提供的几种Kubernetes部署方式"></a>官方提供的几种Kubernetes部署方式</h4><ul>
+<li><p><strong>minikube</strong></p>
+<p>​        Minikube是一个工具，可以在本地快速运行一个单点的Kubernetes，尝试Kubernetes或日常开发的用户使用。不能用于生产环境。</p>
+<p>官方地址：<a href="https://kubernetes.io/docs/setup/minikube/" target="_blank" rel="noopener">https://kubernetes.io/docs/setup/minikube/</a></p>
+</li>
+<li><p><strong>kubeadm</strong></p>
+<p>​        Kubeadm也是一个工具，提供kubeadm init和kubeadm join，用于快速部署Kubernetes集群。</p>
+<p>官方地址：<a href="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/" target="_blank" rel="noopener">https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/</a></p>
+</li>
+<li><p><strong>二进制包</strong></p>
+<p>​        从官方下载发行版的二进制包，手动部署每个组件，组成Kubernetes集群。<br><strong>小结：</strong></p>
+<p>​        生产环境中部署Kubernetes集群，只有Kubeadm和二进制包可选，Kubeadm降低部署门槛，但屏蔽了很多细节，遇到问题很难排查。我们这里使用二进制包部署Kubernetes集群，我也是推荐大家使用这种方式，虽然手动部署麻烦点，但学习很多工作原理，更有利于后期维护。</p>
+</li>
+</ul>
+<p>参考地址：<a href="https://blog.51cto.com/lizhenliang/2325770" target="_blank" rel="noopener">李振良博客</a></p>
+
+        
+    </section>
+</article>
+
+
+
+</div>
+        <footer class="footer">
+    Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, Theme by <a href="https://github.com/sanonz/hexo-theme-concise" target="_blank">Concise</a>
+
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?e4027971a230b210f4671f485b33846a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    
+</footer>
+
+    </main>
+
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.9.0/jquery.min.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        var nodes = {
+            nav: $('#nav'),
+            aside: $('#aside'),
+            asideInner: $('#aside-inner'),
+            navInner: $('#nav-inner')
+        };
+
+        var doing = false;
+        nodes.asideInner.on('webkitAnimationEnd mozAnimationEnd oAnimationEnd oanimationend animationend', function() {
+            if (nodes.aside.hasClass('mobile-open')) {
+                nodes.aside.removeClass('mobile-open');
+            } else {
+                nodes.aside.removeClass('mobile-close panel-show');
+            }
+            doing = false;
+        });
+        $('#open-panel, #aside-mask').on('click', function() {
+            if (doing) {
+                return;
+            }
+            
+            if (nodes.aside.hasClass('panel-show')) {
+                nodes.aside.addClass('mobile-close');
+            } else {
+                nodes.aside.addClass('mobile-open panel-show');
+            }
+        });
+        $('#open-menus').on('click', function() {
+            nodes.navInner.slideToggle();
+        });
+
+        if (window.innerWidth <= 960) {
+            setTimeout(function() {
+                nodes.navInner.slideUp();
+            }, 3000);
+        }
+    });
+    </script>
+    
+        <script type="text/javascript" src="/js/scrollspy.min.js"></script>
+        <script type="text/javascript">
+        $(document.body).scrollspy({target: '#aside-inner'});
+        </script>
+    
+
+</body>
+</html>
